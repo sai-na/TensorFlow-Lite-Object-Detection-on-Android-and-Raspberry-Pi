@@ -166,6 +166,8 @@ while(video.isOpened()):
             # Look up object name from "labels" array using class index
             object_name = labels[int(classes[i])]
             if object_name == "dog":
+                # Play the dog sound
+                os.system("aplay lion.wav")
                 label = '%s: %d%%' % (object_name, int(
                     scores[i]*100))  # Example: 'person: 72%'
                 labelSize, baseLine = cv2.getTextSize(
