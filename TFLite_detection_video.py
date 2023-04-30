@@ -19,6 +19,17 @@ import cv2
 import numpy as np
 import sys
 import importlib.util
+import simpleaudio as sa
+import threading
+
+
+# Define a function to play the sound in a separate thread
+def play_sound():
+    global is_sound_playing
+    wave_obj = sa.WaveObject.from_wave_file("dog_sound.wav")
+    play_obj = wave_obj.play()
+    play_obj.wait_done()
+    is_sound_playing = False
 
 
 # Define and parse input arguments
@@ -84,7 +95,7 @@ with open(PATH_TO_LABELS, 'r') as f:
 # https://www.tensorflow.org/lite/models/object_detection/overview
 # First label is '???', which has to be removed.
 if labels[0] == '???':
-    del(labels[0])
+    del (labels[0])
 
 # Load the Tensorflow Lite model.
 # If using Edge TPU, use special load_delegate argument
@@ -122,7 +133,7 @@ video = cv2.VideoCapture(VIDEO_PATH)
 imW = video.get(cv2.CAP_PROP_FRAME_WIDTH)
 imH = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
-while(video.isOpened()):
+while (video.isOpened()):
 
     # Acquire frame and resize to expected shape [1xHxWx3]
     ret, frame = video.read()
@@ -167,20 +178,29 @@ while(video.isOpened()):
             object_name = labels[int(classes[i])]
             if object_name == "dog":
                 # Play the dog sound
-                   # Check if Pygame mixer is currently busy playing a sound
-                if not pygame.mixer.music.get_busy():
-                    os.system("aplay lion.wav")
-                    label = '%s: %d%%' % (object_name, int(
-                        scores[i]*100))  # Example: 'person: 72%'
-                    labelSize, baseLine = cv2.getTextSize(
-                        label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)  # Get font size
-                    # Make sure not to draw label too close to top of window
-                    label_ymin = max(ymin, labelSize[1] + 10)
-                    # Draw white box to put label text in
-                    cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (
-                        xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED)
-                    cv2.putText(frame, label, (xmin, label_ymin-7),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)  # Draw label text
+
+                # Check if sound is currently playing
+                if not is_sound_playing:
+                    # Start a new thread to play the sound asynchronously
+                    is_sound_playing = True
+                    sound_thread = threading.Thread(target=play_sound)
+                    sound_thread.start()
+                else:
+                    # Skip the sound if it's already playing
+                    continue
+            # Draw label on the image
+                os.system("aplay lion.wav")
+                label = '%s: %d%%' % (object_name, int(
+                    scores[i]*100))  # Example: 'person: 72%'
+                labelSize, baseLine = cv2.getTextSize(
+                    label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)  # Get font size
+                # Make sure not to draw label too close to top of window
+                label_ymin = max(ymin, labelSize[1] + 10)
+                # Draw white box to put label text in
+                cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (
+                    xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED)
+                cv2.putText(frame, label, (xmin, label_ymin-7),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)  # Draw label text
 
     # All the results have been drawn on the frame, so it's time to display it.
     cv2.imshow('Object detector', frame)
