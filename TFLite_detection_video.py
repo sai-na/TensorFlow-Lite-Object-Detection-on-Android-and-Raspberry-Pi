@@ -22,8 +22,10 @@ import importlib.util
 import simpleaudio as sa
 import threading
 
-
+is_sound_playing = False
 # Define a function to play the sound in a separate thread
+
+
 def play_sound():
     global is_sound_playing
     wave_obj = sa.WaveObject.from_wave_file("dog_sound.wav")
@@ -161,7 +163,7 @@ while (video.isOpened()):
         0]  # Confidence of detected objects
 
     # Loop over all detections and draw detection box if confidence is above minimum threshold
-    bool is_sound_playing
+
     for i in range(len(scores)):
         if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
 
