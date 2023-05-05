@@ -20,6 +20,35 @@ import numpy as np
 import sys
 import importlib.util
 
+import threading
+import wave
+import pyaudio
+
+# ... object detection code ...
+
+# Define a flag variable to keep track of sound playing status
+is_sound_playing = False
+
+# Define a function to play the sound in a separate thread
+
+
+def play_sound():
+    global is_sound_playing
+    wf = wave.open("lion.wav", 'rb')
+    p = pyaudio.PyAudio()
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    output=True)
+    data = wf.readframes(1024)
+    while data != b'' and is_sound_playing:
+        stream.write(data)
+        data = wf.readframes(1024)
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+    is_sound_playing = False
+
 
 # Define and parse input arguments
 parser = argparse.ArgumentParser()
@@ -179,6 +208,15 @@ while (video.isOpened()):
                     xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED)
                 cv2.putText(frame, label, (xmin, label_ymin-7),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)  # Draw label text
+                # Check if sound is currently playing
+                if not is_sound_playing:
+                    # Start a new thread to play the sound asynchronously
+                    is_sound_playing = True
+                    sound_thread = threading.Thread(target=play_sound)
+                    sound_thread.start()
+                else:
+                    # Skip the sound if it's already playing
+                    continue
 
     # All the results have been drawn on the frame, so it's time to display it.
     cv2.imshow('Object detector', frame)
