@@ -195,15 +195,15 @@ while (video.isOpened()):
                 cv2.putText(frame, label, (xmin, label_ymin-7),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)  # Draw label text
 
-                # Check if sound is currently playing
-                if not is_sound_playing:
-                    # Start a new thread to play the sound asynchronously
-                    is_sound_playing = True
-                    sound_thread = threading.Thread(target=play_sound)
-                    sound_thread.start()
-                else:
-                    # Skip the sound if it's already playing
-                    continue
+                # # Check if sound is currently playing
+                # if not is_sound_playing:
+                #     # Start a new thread to play the sound asynchronously
+                #     is_sound_playing = True
+                #     sound_thread = threading.Thread(target=play_sound)
+                #     sound_thread.start()
+                # else:
+                #     # Skip the sound if it's already playing
+                #     continue
             # Draw label on the image
 
     # All the results have been drawn on the frame, so it's time to display it.
