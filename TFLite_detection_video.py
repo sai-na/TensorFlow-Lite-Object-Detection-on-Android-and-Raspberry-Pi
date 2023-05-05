@@ -161,6 +161,7 @@ while (video.isOpened()):
         0]  # Confidence of detected objects
 
     # Loop over all detections and draw detection box if confidence is above minimum threshold
+    bool is_sound_playing
     for i in range(len(scores)):
         if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
 
