@@ -28,7 +28,7 @@ is_sound_playing = False
 
 def play_sound():
     global is_sound_playing
-    wave_obj = sa.WaveObject.from_wave_file("dog_sound.wav")
+    wave_obj = sa.WaveObject.from_wave_file("lion.wav")
     play_obj = wave_obj.play()
     play_obj.wait_done()
     is_sound_playing = False
@@ -182,16 +182,6 @@ while (video.isOpened()):
             if object_name == "dog":
                 # Play the dog sound
 
-                # Check if sound is currently playing
-                if not is_sound_playing:
-                    # Start a new thread to play the sound asynchronously
-                    is_sound_playing = True
-                    sound_thread = threading.Thread(target=play_sound)
-                    sound_thread.start()
-                else:
-                    # Skip the sound if it's already playing
-                    continue
-            # Draw label on the image
                 os.system("aplay lion.wav")
                 label = '%s: %d%%' % (object_name, int(
                     scores[i]*100))  # Example: 'person: 72%'
@@ -204,6 +194,17 @@ while (video.isOpened()):
                     xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED)
                 cv2.putText(frame, label, (xmin, label_ymin-7),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)  # Draw label text
+
+                # Check if sound is currently playing
+                if not is_sound_playing:
+                    # Start a new thread to play the sound asynchronously
+                    is_sound_playing = True
+                    sound_thread = threading.Thread(target=play_sound)
+                    sound_thread.start()
+                else:
+                    # Skip the sound if it's already playing
+                    continue
+            # Draw label on the image
 
     # All the results have been drawn on the frame, so it's time to display it.
     cv2.imshow('Object detector', frame)
